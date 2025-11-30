@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-dispatcher-extractor
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.dispatcher.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-extractor
+      {{- include "..selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-extractor
+        {{- include "..labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-db
+          image: {{ printf "%s:%s" .Values.postgres.image.repository .Values.postgres.image.tag }}
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          env:
+            - name: DB_HOST
+              value: {{ printf "%s-postgres" .Release.Name }}
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-password
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
+                echo "Waiting for postgres..."
+                sleep 1
+              done
+      containers:
+        - name: dispatcher-extractor
+          image: "{{ .Values.dispatcher.extractor.image.repository }}:{{ .Values.dispatcher.extractor.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dispatcher.extractor.image.pullPolicy }}
+          env:
+            {{- include "dispatcher.env" . | nindent 12 }}
+            - name: RECRUITAIR_EXTRACTOR_API_BASE_URL
+              value: "http://{{ .Release.Name }}-extractor:{{ .Values.extractor.service.port }}"
+            - name: RECRUITAIR_EXTRACTOR_API_BEARER_TOKEN
+              value: "supersecrettoken" # TODO: Change to use secret
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: {{ .Release.Name }}-extractor-secret
+              #     key: extractor-api-bearer-token

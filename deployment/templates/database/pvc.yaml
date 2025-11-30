@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-postgres-pvc
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: database
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ default "10Gi" .Values.postgres.persistence.size }}
+  storageClassName: {{ .Values.postgres.persistence.storageClass }}

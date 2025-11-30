@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-dispatcher-db-migration" .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ printf "%s-dispatcher-db-migration" .Release.Name }}
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-db
+          image: {{ printf "%s:%s" .Values.postgres.image.repository .Values.postgres.image.tag }}
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          env:
+            - name: DB_HOST
+              value: {{ printf "%s-postgres" .Release.Name }}
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-password
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
+                echo "Waiting for postgres..."
+                sleep 1
+              done
+      containers:
+        - name: db-migration
+          image: {{ printf "%s:%s" .Values.dispatcher.migration.image.repository .Values.dispatcher.migration.image.tag }}
+          imagePullPolicy: {{ .Values.dispatcher.migration.image.pullPolicy }}
+          env:
+            {{- include "dispatcher.env" . | nindent 12 }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000

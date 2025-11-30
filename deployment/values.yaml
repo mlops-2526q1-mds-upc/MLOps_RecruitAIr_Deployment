@@ -1,0 +1,55 @@
+dispatcher:
+  replicaCount: 1
+  db:
+    name: dispatcher_db
+    username: dispatcher_user
+  evaluator:
+    image:
+      repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
+      tag: "0.1.0"
+      pullPolicy: IfNotPresent
+  extractor:
+    image:
+      repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-extractor
+      tag: "0.1.0"
+      pullPolicy: IfNotPresent
+  api:
+    image:
+      repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-api
+      tag: "0.1.0"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 8080
+    autoscaling:
+      minReplicas: 1
+      maxReplicas: 2
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    ingress:
+      host: dispatcher-api.local
+      tls:
+        enabled: false
+        # secretName: dispatcher-api-tls
+  migration:
+    image:
+      repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-migration
+      tag: "0.1.0"
+      pullPolicy: IfNotPresent
+postgres:
+  adminSecretName: postgres-secret
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+  persistence:
+    size: 10Gi
+    storageClass: "standard"
+imagePullSecrets:
+  - name: regcred
+extractor:
+  service:
+    port: 8081
+evaluator:
+  service:
+    port: 8082
