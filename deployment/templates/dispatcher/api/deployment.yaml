@@ -59,6 +59,8 @@ spec:
           imagePullPolicy: {{ .Values.dispatcher.api.image.pullPolicy }}
           env:
             {{- include "dispatcher.env" . | nindent 12 }}
+            - name: RECRUITAIR_API_ROOT_PATH
+              value: {{ .Values.dispatcher.api.ingress.prefix | default "/api" | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.dispatcher.api.service.port }}

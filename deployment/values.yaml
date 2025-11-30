@@ -6,17 +6,17 @@ dispatcher:
   evaluator:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
-      tag: "0.2.1"
+      tag: "0.2.2"
       pullPolicy: IfNotPresent
   extractor:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-extractor
-      tag: "0.2.1"
+      tag: "0.2.2"
       pullPolicy: IfNotPresent
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-api
-      tag: "0.2.1"
+      tag: "0.2.2"
       pullPolicy: IfNotPresent
     service:
       type: ClusterIP
@@ -35,7 +35,7 @@ dispatcher:
   migration:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-migration
-      tag: "0.2.1"
+      tag: "0.2.2"
       pullPolicy: IfNotPresent
 postgres:
   adminSecretName: postgres-secret
