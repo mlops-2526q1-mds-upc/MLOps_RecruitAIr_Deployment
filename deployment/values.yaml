@@ -27,7 +27,8 @@ dispatcher:
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
     ingress:
-      host: dispatcher-api.local
+      host: localhost
+      prefix: /api
       tls:
         enabled: false
         # secretName: dispatcher-api-tls
