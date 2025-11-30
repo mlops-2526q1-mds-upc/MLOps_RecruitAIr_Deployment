@@ -31,6 +31,11 @@ dispatcher:
       tls:
         enabled: false
         # secretName: dispatcher-api-tls
+  migration:
+    image:
+      repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-migration
+      tag: "0.1.0"
+      pullPolicy: IfNotPresent
 postgres:
   adminSecretName: postgres-secret
   image:

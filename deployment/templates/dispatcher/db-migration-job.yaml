@@ -1,25 +1,20 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: {{ .Release.Name }}-dispatcher-extractor
+  name: {{ printf "%s-dispatcher-db-migration" .Release.Name }}
   labels:
+    app.kubernetes.io/name: {{ printf "%s-dispatcher-db-migration" .Release.Name }}
     {{- include "..labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.dispatcher.replicaCount | default 1 }}
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-extractor
-      {{- include "..selectorLabels" . | nindent 6 }}
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
   template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-extractor
-        {{- include "..labels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      restartPolicy: OnFailure
       initContainers:
         - name: wait-for-db
           image: {{ printf "%s:%s" .Values.postgres.image.repository .Values.postgres.image.tag }}
@@ -48,16 +43,11 @@ spec:
                 sleep 1
               done
       containers:
-        - name: dispatcher-extractor
-          image: "{{ .Values.dispatcher.extractor.image.repository }}:{{ .Values.dispatcher.extractor.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.dispatcher.extractor.image.pullPolicy }}
+        - name: db-migration
+          image: {{ printf "%s:%s" .Values.dispatcher.migration.image.repository .Values.dispatcher.migration.image.tag }}
+          imagePullPolicy: {{ .Values.dispatcher.migration.image.pullPolicy }}
           env:
             {{- include "dispatcher.env" . | nindent 12 }}
-            - name: RECRUITAIR_EXTRACTOR_API_BASE_URL
-              value: "http://{{ .Release.Name }}-extractor:{{ .Values.extractor.service.port }}"
-            - name: RECRUITAIR_EXTRACTOR_API_BEARER_TOKEN
-              value: "supersecrettoken" # TODO: Change to use secret
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: {{ .Release.Name }}-extractor-secret
-              #     key: extractor-api-bearer-token
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000

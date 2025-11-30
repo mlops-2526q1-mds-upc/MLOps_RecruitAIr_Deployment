@@ -19,6 +19,33 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+        - name: wait-for-db
+          image: {{ printf "%s:%s" .Values.postgres.image.repository .Values.postgres.image.tag }}
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          env:
+            - name: DB_HOST
+              value: {{ printf "%s-postgres" .Release.Name }}
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-password
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
+                echo "Waiting for postgres..."
+                sleep 1
+              done
       containers:
         - name: dispatcher-api
           image: "{{ .Values.dispatcher.api.image.repository }}:{{ .Values.dispatcher.api.image.tag | default .Chart.AppVersion }}"

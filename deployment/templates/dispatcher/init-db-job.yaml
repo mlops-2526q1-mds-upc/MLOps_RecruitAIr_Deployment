@@ -20,6 +20,7 @@ kind: Job
 metadata:
   name: {{ printf "%s-dispatcher-init-db" .Release.Name }}
   labels:
+    app.kubernetes.io/name: {{ printf "%s-dispatcher-init-db" .Release.Name }}
     {{- include "..labels" . | nindent 4 }}
 spec:
   backoffLimit: 3
