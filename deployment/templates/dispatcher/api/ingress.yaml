@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-dispatcher-api
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  rules:
+  - host: {{ .Values.dispatcher.api.ingress.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-dispatcher-api
+            port:
+              number: {{ .Values.dispatcher.api.service.port }}
+  {{- if .Values.dispatcher.api.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.dispatcher.api.ingress.host }}
+    secretName: {{ .Values.dispatcher.api.ingress.tls.secretName }}
+  {{- end }}

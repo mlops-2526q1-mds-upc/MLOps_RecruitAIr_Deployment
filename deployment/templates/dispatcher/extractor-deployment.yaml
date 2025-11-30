@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-dispatcher-extractor
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.dispatcher.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-extractor
+      {{- include "..selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-extractor
+        {{- include "..labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: dispatcher-extractor
+          image: "{{ .Values.dispatcher.extractor.image.repository }}:{{ .Values.dispatcher.extractor.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dispatcher.extractor.image.pullPolicy }}
