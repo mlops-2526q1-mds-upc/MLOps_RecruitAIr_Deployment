@@ -38,12 +38,19 @@ spec:
                 secretKeyRef:
                   name: {{ include "dispatcher.secretName" . }}
                   key: postgres-password
+            - name: DB_NAME
+              value: {{ include "dispatcher.dbName" . }}
           command:
             - sh
             - -c
             - |
               until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
                 echo "Waiting for postgres..."
+                sleep 1
+              done
+              # Wait until the table 'job_offers' exists (until migrations are applied)
+              until psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "\dt" | grep job_offers; do
+                echo "Waiting for dispatcher database to be ready..."
                 sleep 1
               done
       containers:
