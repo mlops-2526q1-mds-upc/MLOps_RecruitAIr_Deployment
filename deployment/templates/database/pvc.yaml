@@ -12,6 +12,4 @@ spec:
   resources:
     requests:
       storage: {{ default "10Gi" .Values.postgres.persistence.size }}
-{{- if .Values.postgres.persistence.storageClass }}
   storageClassName: {{ .Values.postgres.persistence.storageClass }}
-{{- end }}

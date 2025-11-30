@@ -1,5 +1,8 @@
 dispatcher:
   replicaCount: 1
+  db:
+    name: dispatcher_db
+    username: dispatcher_user
   evaluator:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
@@ -29,10 +32,7 @@ dispatcher:
         enabled: false
         # secretName: dispatcher-api-tls
 postgres:
-  username: postgres
-  password: postgrespassword
-  database: recruitairdb
-  secretName: postgres-secret
+  adminSecretName: postgres-secret
   image:
     repository: postgres
     tag: "16-alpine"
@@ -42,3 +42,9 @@ postgres:
     storageClass: "standard"
 imagePullSecrets:
   - name: regcred
+extractor:
+  service:
+    port: 8081
+evaluator:
+  service:
+    port: 8082

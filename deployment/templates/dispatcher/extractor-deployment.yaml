@@ -24,3 +24,13 @@ spec:
         - name: dispatcher-extractor
           image: "{{ .Values.dispatcher.extractor.image.repository }}:{{ .Values.dispatcher.extractor.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.dispatcher.extractor.image.pullPolicy }}
+          env:
+            {{- include "dispatcher.env" . | nindent 12 }}
+            - name: RECRUITAIR_EXTRACTOR_API_BASE_URL
+              value: "http://{{ .Release.Name }}-extractor:{{ .Values.extractor.service.port }}"
+            - name: RECRUITAIR_EXTRACTOR_API_BEARER_TOKEN
+              value: "supersecrettoken" # TODO: Change to use secret
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: {{ .Release.Name }}-extractor-secret
+              #     key: extractor-api-bearer-token

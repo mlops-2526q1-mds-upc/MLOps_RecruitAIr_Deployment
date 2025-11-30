@@ -1,0 +1,100 @@
+{{- $existing := lookup "v1" "Secret" .Release.Namespace (include "dispatcher.secretName" .) -}}
+
+{{- if not $existing }}
+# generated once at template render time and stored in the cluster; base64 encoded
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "dispatcher.secretName" . }}
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+type: Opaque
+data:
+  postgres-username: {{ include "dispatcher.dbUsername" . | b64enc }}
+  postgres-password: {{ randAlphaNum 32 | b64enc }}
+---
+{{- end }}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-dispatcher-init-db" .Release.Name }}
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init-dispatcher-db
+          image: {{ printf "%s:%s" .Values.postgres.image.repository .Values.postgres.image.tag }}
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.adminSecretName }}
+                  key: postgres-password
+            - name: DB_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgres.adminSecretName }}
+                  key: postgres-username
+            - name: DB_ADMIN_DB
+              value: "postgres"
+            - name: DB_HOST
+              value: {{ printf "%s-postgres" .Release.Name }}
+            - name: DB_PORT
+              value: "5432"
+            - name: DISPATCHER_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-password
+            - name: DISPATCHER_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dispatcher.secretName" . }}
+                  key: postgres-username
+            - name: DISPATCHER_DB_NAME
+              value: {{ include "dispatcher.dbName" . }}
+          command:
+            - sh
+            - -c
+            - |
+              set -euo pipefail
+              : "${DB_HOST:=localhost}"
+              : "${DB_PORT:=5432}"
+              : "${DB_ADMIN_DB:=postgres}"
+              # wait for postgres to be available
+              until pg_isready -h "$DB_HOST" -p "${DB_PORT}" -U "$DB_ADMIN_USER"; do
+                echo "Waiting for postgres..."
+                sleep 1
+              done
+              # Create a role, and a database for the dispatcher
+
+              # Check if role exists
+              ROLE_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -d "$DB_ADMIN_DB" -U "$DB_ADMIN_USER" -tAc "SELECT 1 FROM pg_roles WHERE rolname='${DISPATCHER_DB_USERNAME}';")
+              if [ "$ROLE_EXISTS" != "1" ]; then
+                echo "Creating role ${DISPATCHER_DB_USERNAME}"
+                psql -h "$DB_HOST" -p "$DB_PORT" -d "$DB_ADMIN_DB" -U "$DB_ADMIN_USER" -c "CREATE ROLE ${DISPATCHER_DB_USERNAME} WITH LOGIN PASSWORD '${DISPATCHER_DB_PASSWORD}';"
+              else
+                echo "Role ${DISPATCHER_DB_USERNAME} already exists"
+              fi
+
+              # Check if database exists
+              DB_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -d "$DB_ADMIN_DB" -U "$DB_ADMIN_USER" -tAc "SELECT 1 FROM pg_database WHERE datname='${DISPATCHER_DB_NAME}';")
+              if [ "$DB_EXISTS" != "1" ]; then
+                echo "Creating database ${DISPATCHER_DB_NAME}"
+                psql -h "$DB_HOST" -p "$DB_PORT" -d "$DB_ADMIN_DB" -U "$DB_ADMIN_USER" -c "CREATE DATABASE ${DISPATCHER_DB_NAME} OWNER ${DISPATCHER_DB_USERNAME};"
+              else
+                echo "Database ${DISPATCHER_DB_NAME} already exists"
+              fi
+
+              # Grant all privileges on the database to the user
+              psql -h "$DB_HOST" -p "$DB_PORT" -d "$DB_ADMIN_DB" -U "$DB_ADMIN_USER" -c "GRANT ALL PRIVILEGES ON DATABASE ${DISPATCHER_DB_NAME} TO ${DISPATCHER_DB_USERNAME};"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000

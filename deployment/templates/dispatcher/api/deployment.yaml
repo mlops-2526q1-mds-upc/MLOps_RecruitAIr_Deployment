@@ -23,6 +23,8 @@ spec:
         - name: dispatcher-api
           image: "{{ .Values.dispatcher.api.image.repository }}:{{ .Values.dispatcher.api.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.dispatcher.api.image.pullPolicy }}
+          env:
+            {{- include "dispatcher.env" . | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.dispatcher.api.service.port }}
