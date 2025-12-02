@@ -27,5 +27,5 @@ kubectl create secret generic postgres-secret --from-literal=postgres-password=<
     Replace `<your-name>` and `<your-pword>` with your GitHub Container Registry credentials. Replace `<some_password>` and `<some_username>` with your desired values for the Postgres admin login.
 9. Finally, install the Helm chart:
 ```bash
-helm install recruitair ./deployment -n recruitair --wait
+helm install recruitair ./recruitair -n recruitair --wait
 ```
