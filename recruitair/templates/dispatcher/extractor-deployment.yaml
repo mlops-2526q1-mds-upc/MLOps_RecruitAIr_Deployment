@@ -54,6 +54,9 @@ spec:
                 echo "Waiting for dispatcher database to be ready..."
                 sleep 1
               done
+        - name: wait-for-extractor-api
+          image: busybox:latest
+          command: ['sh', '-c', 'until nc -z -v -w30 {{ .Release.Name }}-extractor-api {{ .Values.extractor.api.service.port }}; do echo "Waiting for Extractor API..."; sleep 5; done; echo "Extractor API is up!"']
       containers:
         - name: dispatcher-extractor
           image: "{{ .Values.dispatcher.extractor.image.repository }}:{{ .Values.dispatcher.extractor.image.tag | default .Chart.AppVersion }}"
