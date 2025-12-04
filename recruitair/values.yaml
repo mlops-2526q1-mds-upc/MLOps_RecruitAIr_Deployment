@@ -79,6 +79,12 @@ evaluator:
 
 
 extractor:
+  model:
+    name: dolphin3
+    version: 8b
+  prompt:
+    name: criteria-extraction
+    version: "1"
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/extractor-api
@@ -96,12 +102,6 @@ extractor:
       enabled: false
       host: localhost
       prefix: /extractor
-    model:
-      name: dolphin3
-      version: 8b
-    prompt:
-      name: criteria-extraction
-      version: "1"
   ollama:
     image:
       repository: ollama/ollama
@@ -119,6 +119,9 @@ extractor:
       enabled: false
       host: localhost
       prefix: /ollama
+    persistence:
+      size: 10Gi
+      storageClass: "standard"
 
 mlflow:
   trackingUri: https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws

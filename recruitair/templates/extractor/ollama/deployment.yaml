@@ -21,8 +21,11 @@ spec:
       {{- end }}
       containers:
         - name: ollama
-          image: "{{ .Values.extractor.ollama.image.repository }}:{{ .Values.extractor.ollama.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.extractor.ollama.image.repository }}:{{ .Values.extractor.ollama.image.tag }}"
           imagePullPolicy: {{ .Values.extractor.ollama.image.pullPolicy }}
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
           ports:
             - name: http
               containerPort: {{ .Values.extractor.ollama.service.port }}
@@ -41,3 +44,7 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-extractor-ollama-pvc

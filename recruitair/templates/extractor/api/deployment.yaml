@@ -19,6 +19,17 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+        - name: wait-for-ollama
+          image: busybox:latest
+          command: ['sh', '-c', 'until nc -z -v -w30 {{ .Release.Name }}-extractor-ollama {{ .Values.extractor.ollama.service.port }}; do echo "Waiting for Ollama..."; sleep 5; done; echo "Ollama is up!"']
+        - name: ollama-pull-model
+          image: "{{ .Values.extractor.ollama.image.repository }}:{{ .Values.extractor.ollama.image.tag }}"
+          imagePullPolicy: {{ .Values.extractor.ollama.image.pullPolicy }}
+          env:
+            - name: OLLAMA_HOST
+              value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
+          command: ['sh', '-c', 'ollama pull {{ .Values.extractor.model.name }}']
       containers:
         - name: extractor-api
           image: "{{ .Values.extractor.api.image.repository }}:{{ .Values.extractor.api.image.tag | default .Chart.AppVersion }}"
@@ -27,13 +38,13 @@ spec:
             - name: MLFLOW_TRACKING_URI
               value: {{ .Values.mlflow.trackingUri }}
             - name: RECRUITAIR_PROMPT
-              value: {{ .Values.extractor.api.prompt.name }}
+              value: {{ .Values.extractor.prompt.name }}
             - name: RECRUITAIR_PROMPT_VERSION
-              value: {{ .Values.extractor.api.prompt.version | quote }}
+              value: {{ .Values.extractor.prompt.version | quote }}
             - name: RECRUITAIR_MODEL
-              value: {{ .Values.extractor.api.model.name }}
+              value: {{ .Values.extractor.model.name }}
             - name: RECRUITAIR_MODEL_VERSION
-              value: {{ .Values.extractor.api.model.version | quote }}
+              value: {{ .Values.extractor.model.version | quote }}
             - name: RECRUITAIR_OLLAMA_BASE_URL
               value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
           ports:
