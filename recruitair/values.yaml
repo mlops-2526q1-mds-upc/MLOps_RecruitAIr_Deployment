@@ -73,6 +73,52 @@ evaluator:
     enabled: false
     host: localhost
     prefix: /evaluator
+  model:
+    name: criteria-evaluation
+    version: "1"
+
+
+extractor:
+  api:
+    image:
+      repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/extractor-api
+      tag: "0.1.0"
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 8000
+    autoscaling:
+      minReplicas: 1
+      maxReplicas: 2
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    ingress:
+      enabled: false
+      host: localhost
+      prefix: /extractor
+    model:
+      name: dolphin3
+      version: 8b
+    prompt:
+      name: criteria-extraction
+      version: "1"
+  ollama:
+    image:
+      repository: ollama/ollama
+      tag: 0.13.1
+      pullPolicy: IfNotPresent
+    service:
+      type: ClusterIP
+      port: 11434
+    autoscaling:
+      minReplicas: 1
+      maxReplicas: 2
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    ingress:
+      enabled: false
+      host: localhost
+      prefix: /ollama
 
 mlflow:
   trackingUri: https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws

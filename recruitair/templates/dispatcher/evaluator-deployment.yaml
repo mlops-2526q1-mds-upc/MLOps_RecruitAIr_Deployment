@@ -61,7 +61,7 @@ spec:
           env:
             {{- include "dispatcher.env" . | nindent 12 }}
             - name: RECRUITAIR_EVALUATOR_API_BASE_URL
-              value: "http://{{ .Release.Name }}-evaluator:{{ .Values.evaluator.service.port }}"
+              value: "http://{{ .Release.Name }}-evaluator-api:{{ .Values.evaluator.service.port }}"
             - name: RECRUITAIR_EVALUATOR_API_BEARER_TOKEN
               value: "supersecrettoken" # TODO: Change to use secret
               # valueFrom:

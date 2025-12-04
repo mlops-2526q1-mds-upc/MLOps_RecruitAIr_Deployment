@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-extractor-ollama
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-extractor-ollama
+      {{- include "..selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-extractor-ollama
+        {{- include "..labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: ollama
+          image: "{{ .Values.extractor.ollama.image.repository }}:{{ .Values.extractor.ollama.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.extractor.ollama.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.extractor.ollama.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.extractor.ollama.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.extractor.ollama.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10

@@ -26,6 +26,10 @@ spec:
           env:
             - name: MLFLOW_TRACKING_URI
               value: {{ .Values.mlflow.trackingUri }}
+            - name: RECRUITAIR_MODEL
+              value: {{ .Values.evaluator.model.name }}
+            - name: RECRUITAIR_MODEL_VERSION
+              value: {{ .Values.evaluator.model.version | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.evaluator.service.port }}

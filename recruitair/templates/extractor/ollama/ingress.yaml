@@ -1,0 +1,29 @@
+{{- if .Values.extractor.ollama.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-extractor-ollama
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.extractor.ollama.ingress.host }}
+    http:
+      paths:
+      - path: {{ printf "%s(/|$)(.*)" (.Values.extractor.ollama.ingress.prefix | default "/api") }} 
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-extractor-ollama
+            port:
+              number: {{ .Values.extractor.ollama.service.port }}
+  {{- if .Values.extractor.ollama.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.extractor.ollama.ingress.host }}
+    secretName: {{ .Values.extractor.ollama.ingress.tls.secretName }}
+  {{- end }}
+{{- end }}
