@@ -1,0 +1,29 @@
+{{- if .Values.evaluator.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-evaluator-api
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.evaluator.ingress.host }}
+    http:
+      paths:
+      - path: {{ printf "%s(/|$)(.*)" (.Values.evaluator.ingress.prefix | default "/api") }} 
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-evaluator-api
+            port:
+              number: {{ .Values.evaluator.service.port }}
+  {{- if .Values.evaluator.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.evaluator.ingress.host }}
+    secretName: {{ .Values.evaluator.ingress.tls.secretName }}
+  {{- end }}
+{{- end }}

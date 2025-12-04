@@ -27,6 +27,7 @@ dispatcher:
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
     ingress:
+      enabled: true
       host: localhost
       prefix: /api
       tls:
@@ -54,3 +55,24 @@ extractor:
 evaluator:
   service:
     port: 8082
+
+evaluator:
+  image:
+    repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/evaluator-api
+    tag: "0.1.3"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  ingress:
+    enabled: false
+    host: localhost
+    prefix: /evaluator
+
+mlflow:
+  trackingUri: https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws

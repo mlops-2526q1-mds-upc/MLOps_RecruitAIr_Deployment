@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-evaluator-api
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.evaluator.service.type }}
+  ports:
+    - port: {{ .Values.evaluator.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}-evaluator-api
+    {{- include "..selectorLabels" . | nindent 4 }}
