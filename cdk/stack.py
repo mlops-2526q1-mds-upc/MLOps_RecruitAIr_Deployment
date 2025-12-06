@@ -12,125 +12,6 @@ from constructs import Construct
 from aws_cdk.lambda_layer_kubectl_v33 import KubectlV33Layer
 
 
-class RecruitAirEksStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, chart_path: str, **kwargs) -> None:
-        super().__init__(scope, construct_id, **kwargs)
-
-        # 1. Create a VPC for the EKS Cluster
-        # EKS works best with a dedicated VPC to manage IP addresses and networking.
-        vpc = ec2.Vpc(self, "RecruitAirVPC", max_azs=2)
-
-        kubectl_layer = KubectlV33Layer(self, "kubectl")
-
-        # 2. Create the EKS Cluster
-        cluster = eks.Cluster(
-            self,
-            "RecruitAirCluster",
-            vpc=vpc,
-            version=eks.KubernetesVersion.V1_33,
-            default_capacity=0,
-            cluster_name="recruitair-cluster",
-            kubectl_layer=kubectl_layer,
-            endpoint_access=eks.EndpointAccess.PUBLIC_AND_PRIVATE,
-        )
-
-        # 3. Add a Managed Node Group
-        cluster.add_nodegroup_capacity(
-            "RecruitAirNodeGroup",
-            instance_types=[ec2.InstanceType("t3.micro")],
-            min_size=1,
-            ami_type=eks.NodegroupAmiType.AL2023_X86_64_STANDARD,
-        )
-
-        # 4. Add EBS CSI Driver Add-on
-        ebs_policy = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "service-role/AmazonEBSCSIDriverPolicy"
-        )
-        for node_group in cluster.node.children:
-            if isinstance(node_group, eks.Nodegroup):
-                node_group.role.add_managed_policy(ebs_policy)
-
-        eks.CfnAddon(
-            self,
-            "EbsCsiAddon",
-            cluster_name=cluster.cluster_name,
-            addon_name="aws-ebs-csi-driver",
-            resolve_conflicts="OVERWRITE"
-        )
-
-        cluster.aws_auth.add_user_mapping(
-            user=iam.User.from_user_arn(self, "Me", "arn:aws:iam::424851482325:user/alfonso.brown"),
-            groups=["system:masters"]
-        )
-
-        # 5. AWS Load Balancer Controller (Replaces Nginx for AWS)
-        eks.AlbController(
-            self,
-            "AlbController",
-            cluster=cluster,
-            version=eks.AlbControllerVersion.V2_6_2
-        )
-
-        # 6. Create Secrets
-
-        # 'postgres-secret'
-        # In a real production setup, use AWS Secrets Manager + ExternalSecrets.
-        # Here we mimic the manual creation for simplicity.
-        postgres_secret = {
-            "apiVersion": "v1",
-            "kind": "Secret",
-            "metadata": {"name": "postgres-secret", "namespace": "default"},
-            "type": "Opaque",
-            "stringData": {
-                "postgres-username": "postgres",
-                "postgres-password": ""
-            }
-        }
-
-        # 'regcred' (Image Pull Secret)
-        # Required if pulling from GHCR.
-        docker_config = {
-            "auths": {
-                "ghcr.io": {
-                    "username": "",
-                    "password": "",
-                }
-            }
-        }
-
-        regcred_secret = {
-            "apiVersion": "v1",
-            "kind": "Secret",
-            "metadata": {"name": "regcred", "namespace": "default"},
-            "type": "kubernetes.io/dockerconfigjson",
-            "stringData": {
-                ".dockerconfigjson": json.dumps(docker_config)
-            }
-        }
-
-        # Apply secrets to the cluster
-        cluster.add_manifest("AppSecrets", postgres_secret, regcred_secret)
-
-        # 7. Deploy Your Local Helm Chart
-        # Points to the 'recruitair' folder in your directory.
-        app_chart = cluster.add_helm_chart(
-            "RecruitAirChart",
-            chart=chart_path,
-            release="recruitair",
-            namespace="default",
-            values={
-                "ingress": {
-                    "className": "alb"
-                },
-                "postgres": {
-                    "persistence": {
-                        "storageClass": "gp2"
-                    }
-                }
-            }
-        )
-
-
 class EksAlbStack(Stack):
     def __init__(self, scope: Construct, id: str, *, env=None, **kwargs):
         super().__init__(scope, id, env=env, **kwargs)
@@ -165,6 +46,11 @@ class EksAlbStack(Stack):
 
         with open(policy_file, "r") as f:
             policy_doc = json.load(f)
+
+        cluster.aws_auth.add_user_mapping(
+            user=iam.User.from_user_arn(self, "Me", "arn:aws:iam::424851482325:user/alfonso.brown"),
+            groups=["system:masters"]
+        )
 
         # 4) Create Kubernetes service account for the Load Balancer Controller (IRSA)
         sa = cluster.add_service_account(
