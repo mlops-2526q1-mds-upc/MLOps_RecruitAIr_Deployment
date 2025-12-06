@@ -1,0 +1,27 @@
+name: Deploy
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::<acct>:role/CICD-Role
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+      - name: Package and upload chart
+        run: ./scripts/publish_chart.sh
+
+      - name: Install CDK
+        run: npm install -g aws-cdk
+
+      - name: Deploy via CDK
+        run: cdk deploy --require-approval never

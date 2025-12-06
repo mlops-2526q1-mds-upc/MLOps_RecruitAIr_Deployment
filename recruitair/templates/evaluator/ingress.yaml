@@ -6,9 +6,18 @@ metadata:
   labels:
     {{- include "..labels" . | nindent 4 }}
   annotations:
+    {{- if eq .Values.ingress.className "alb" }}
+    # AWS ALB Annotations
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: recruitair-group
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    {{- else }}
+    # Nginx (Local) Annotations
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- end }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
   - host: {{ .Values.evaluator.ingress.host }}
     http:
@@ -20,10 +29,4 @@ spec:
             name: {{ .Release.Name }}-evaluator-api
             port:
               number: {{ .Values.evaluator.service.port }}
-  {{- if .Values.evaluator.ingress.tls.enabled }}
-  tls:
-  - hosts:
-    - {{ .Values.evaluator.ingress.host }}
-    secretName: {{ .Values.evaluator.ingress.tls.secretName }}
-  {{- end }}
 {{- end }}

@@ -6,14 +6,23 @@ metadata:
   labels:
     {{- include "..labels" . | nindent 4 }}
   annotations:
+    { { - if eq .Values.ingress.className "alb" } }
+    # AWS ALB Annotations
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: recruitair-group
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    { { - else } }
+    # Nginx (Local) Annotations
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    { { - end } }
 spec:
   ingressClassName: nginx
   rules:
   - host: {{ .Values.extractor.api.ingress.host }}
     http:
       paths:
-      - path: {{ printf "%s(/|$)(.*)" (.Values.extractor.api.ingress.prefix | default "/api") }} 
+      - path: {{ printf "%s(/|$)(.*)" (.Values.extractor.api.ingress.prefix | default "/api") }}
         pathType: ImplementationSpecific
         backend:
           service:
