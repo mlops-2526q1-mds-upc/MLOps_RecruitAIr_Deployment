@@ -125,3 +125,6 @@ extractor:
 
 mlflow:
   trackingUri: https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws
+
+ingress:
+  className: alb
