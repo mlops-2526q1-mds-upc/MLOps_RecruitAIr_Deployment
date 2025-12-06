@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-extractor-api
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-extractor-api
+      {{- include "..selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-extractor-api
+        {{- include "..labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-ollama
+          image: busybox:latest
+          command: ['sh', '-c', 'until nc -z -v -w30 {{ .Release.Name }}-extractor-ollama {{ .Values.extractor.ollama.service.port }}; do echo "Waiting for Ollama..."; sleep 5; done; echo "Ollama is up!"']
+        - name: ollama-pull-model
+          image: "{{ .Values.extractor.ollama.image.repository }}:{{ .Values.extractor.ollama.image.tag }}"
+          imagePullPolicy: {{ .Values.extractor.ollama.image.pullPolicy }}
+          env:
+            - name: OLLAMA_HOST
+              value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
+          command: ['sh', '-c', 'ollama pull {{ .Values.extractor.model.name }}']
+      containers:
+        - name: extractor-api
+          image: "{{ .Values.extractor.api.image.repository }}:{{ .Values.extractor.api.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.extractor.api.image.pullPolicy }}
+          env:
+            - name: MLFLOW_TRACKING_URI
+              value: {{ .Values.mlflow.trackingUri }}
+            - name: RECRUITAIR_PROMPT
+              value: {{ .Values.extractor.prompt.name }}
+            - name: RECRUITAIR_PROMPT_VERSION
+              value: {{ .Values.extractor.prompt.version | quote }}
+            - name: RECRUITAIR_MODEL
+              value: {{ .Values.extractor.model.name }}
+            - name: RECRUITAIR_MODEL_VERSION
+              value: {{ .Values.extractor.model.version | quote }}
+            - name: RECRUITAIR_OLLAMA_BASE_URL
+              value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.extractor.api.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.extractor.api.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.extractor.api.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10

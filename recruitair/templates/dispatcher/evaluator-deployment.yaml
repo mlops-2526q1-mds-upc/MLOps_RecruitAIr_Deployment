@@ -54,6 +54,9 @@ spec:
                 echo "Waiting for dispatcher database to be ready..."
                 sleep 1
               done
+        - name: wait-for-evaluator-api
+          image: busybox:latest
+          command: ['sh', '-c', 'until nc -z -v -w30 {{ .Release.Name }}-evaluator-api {{ .Values.evaluator.service.port }}; do echo "Waiting for Evaluator API..."; sleep 5; done; echo "Evaluator API is up!"']
       containers:
         - name: dispatcher-evaluator
           image: "{{ .Values.dispatcher.evaluator.image.repository }}:{{ .Values.dispatcher.evaluator.image.tag | default .Chart.AppVersion }}"
@@ -61,7 +64,7 @@ spec:
           env:
             {{- include "dispatcher.env" . | nindent 12 }}
             - name: RECRUITAIR_EVALUATOR_API_BASE_URL
-              value: "http://{{ .Release.Name }}-evaluator:{{ .Values.evaluator.service.port }}"
+              value: "http://{{ .Release.Name }}-evaluator-api:{{ .Values.evaluator.service.port }}"
             - name: RECRUITAIR_EVALUATOR_API_BEARER_TOKEN
               value: "supersecrettoken" # TODO: Change to use secret
               # valueFrom:
