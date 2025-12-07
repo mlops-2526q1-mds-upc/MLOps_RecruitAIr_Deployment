@@ -1,4 +1,3 @@
-# Configmap for the prometheus server (prometheus.yml)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,5 +5,8 @@ metadata:
   labels:
     {{- include "..labels" . | nindent 4 }}
 data:
-  prometheus.yml: |
-    {{- .Files.Get "config/prometheus/prometheus.yml" | indent 4 }}
+  {{- range $path, $bytes := .Files.Glob "config/prometheus/*.yml" }}
+  {{- $name := base $path }}
+  {{ $name }}: |-
+{{ tpl ($bytes | toString) $ | nindent 4 }}
+  {{- end }}
