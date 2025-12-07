@@ -71,9 +71,12 @@ evaluator:
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
   ingress:
-    enabled: false
+    enabled: true
     host: localhost
     prefix: /evaluator
+    tls:
+      enabled: false
+      # secretName: evaluator-api-tls
   model:
     name: criteria-evaluation
     version: "1"
@@ -103,9 +106,12 @@ extractor:
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
     ingress:
-      enabled: false
+      enabled: true
       host: localhost
       prefix: /extractor
+      tls:
+        enabled: false
+        # secretName: extractor-api-tls
   ollama:
     image:
       repository: ollama/ollama
@@ -123,6 +129,9 @@ extractor:
       enabled: false
       host: localhost
       prefix: /ollama
+      tls:
+        enabled: false
+        # secretName: extractor-ollama-tls
     persistence:
       size: 10Gi
       storageClass: "standard"
