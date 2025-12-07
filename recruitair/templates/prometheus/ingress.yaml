@@ -1,0 +1,30 @@
+{{- if .Values.prometheus.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-prometheus
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+  annotations:
+    # nginx.ingress.kubernetes.io/rewrite-target: /$2 # Without the rewrite target, so prometheus works with subpath
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.prometheus.ingress.host }}
+    http:
+      paths:
+      - path: {{ printf "%s(/|$)(.*)" (.Values.prometheus.ingress.prefix | default "") }} 
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-prometheus
+            port:
+              number: {{ .Values.prometheus.service.port }}
+  {{- if .Values.prometheus.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.prometheus.ingress.host }}
+    secretName: {{ .Values.prometheus.ingress.tls.secretName }}
+  {{- end }}
+{{- end }}

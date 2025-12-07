@@ -1,0 +1,9 @@
+# Configmap for the prometheus server (prometheus.yml)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-grafana-dashboards-config
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+data:
+  {{- (.Files.Glob "config/grafana/dashboards/*.json").AsConfig | nindent 2 }}

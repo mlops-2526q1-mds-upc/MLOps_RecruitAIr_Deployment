@@ -1,0 +1,87 @@
+{
+    "title": "RecruitAIr - Criteria Extractor API",
+    "uid": "recruitair-criteria-extractor-api",
+    "schemaVersion": 39,
+    "version": 1,
+    "panels": [
+        {
+            "type": "stat",
+            "title": "Total /eval Requests",
+            "id": 1,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "targets": [
+                {
+                    "expr": "sum(recruitair_eval_requests_total)",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "stat",
+            "title": "Failed /eval Requests",
+            "id": 2,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "targets": [
+                {
+                    "expr": "sum(recruitair_eval_requests_failed_total)",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeSeries",
+            "title": "p95 /eval Latency (s)",
+            "id": 3,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(recruitair_eval_request_latency_seconds_bucket[5m])) by (le))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeSeries",
+            "title": "Model Evaluation Latency (p95, s)",
+            "id": 4,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(recruitair_model_evaluation_latency_seconds_bucket[5m])) by (le))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeSeries",
+            "title": "Offer Text Length (avg chars)",
+            "id": 5,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "targets": [
+                {
+                    "expr": "sum(rate(recruitair_offer_text_length_chars_sum[5m])) / sum(rate(recruitair_offer_text_length_chars_count[5m]))",
+                    "refId": "A"
+                }
+            ]
+        }
+    ],
+    "time": {
+        "from": "now-1h",
+        "to": "now"
+    }
+}

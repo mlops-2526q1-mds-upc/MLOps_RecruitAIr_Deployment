@@ -1,0 +1,10 @@
+# Configmap for the prometheus server (prometheus.yml)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-prometheus-config
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+data:
+  prometheus.yml: |
+    {{- .Files.Get "config/prometheus/prometheus.yml" | indent 4 }}
