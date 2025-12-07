@@ -35,6 +35,16 @@ spec:
               value: "%(protocol)s://%(domain)s/grafana/"
             - name: GF_SERVER_SERVE_FROM_SUB_PATH
               value: "true"
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.grafana.adminCredentialsSecretName }}
+                  key: admin-user
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.grafana.adminCredentialsSecretName }}
+                  key: admin-password
           ports:
             - name: http
               containerPort: {{ .Values.grafana.service.port }}

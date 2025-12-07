@@ -30,7 +30,12 @@ kubectl create secret generic postgres-secret --from-literal=postgres-password=<
 kubectl -n recruitair create secret generic aws-creds --from-literal=aws-access-key-id=<your_access_key_id> --from-literal=aws-secret-access-key=<your_secret_access_key> --from-literal=aws-region=eu-north-1
 ```
     Replace `<your_access_key_id>` and `<your_secret_access_key>` with your AWS credentials. If running inside AWS, you can skip this step and comment out the `awsSecret` field in `values.yaml`.
-10. Finally, install the Helm chart:
+10. Create the Grafana admin secret:
+```bash
+kubectl -n recruitair create secret generic grafana-admin-credentials --from-literal=admin-user=<grafana_admin_user> --from-literal=admin-password=<grafana_admin_password>
+```
+    Replace `<grafana_admin_user>` and `<grafana_admin_password>` with your desired Grafana admin credentials.
+11. Finally, install the Helm chart:
 ```bash
 helm install recruitair ./recruitair -n recruitair --wait
 ```

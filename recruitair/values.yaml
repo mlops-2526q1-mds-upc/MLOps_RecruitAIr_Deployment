@@ -159,6 +159,7 @@ prometheus:
     storageClass: "standard"
 
 grafana:
+  adminCredentialsSecretName: grafana-admin-credentials
   image:
     repository: grafana/grafana
     tag: "12.1"
