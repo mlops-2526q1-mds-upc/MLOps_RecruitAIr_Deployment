@@ -138,3 +138,22 @@ extractor:
 
 mlflow:
   trackingUri: https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws
+
+prometheus:
+  image:
+    repository: prom/prometheus
+    tag: "v3.8.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9090
+  ingress:
+    enabled: false
+    host: localhost
+    prefix: /prometheus
+    tls:
+      enabled: false
+      # secretName: prometheus-tls
+  persistence:
+    size: 10Gi
+    storageClass: "standard"

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-prometheus
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-prometheus
+      {{- include "..selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-prometheus
+        {{- include "..labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: prometheus
+          image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
+          imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
+          volumeMounts:
+            - name: prometheus-storage
+              mountPath: /prometheus
+            - mountPath: /etc/prometheus/
+              name: config-volume
+              readOnly: true
+          # command:
+          #   - "/bin/prometheus"
+          # args:
+          #   - "--config.file=/etc/prometheus/prometheus.yml"
+          #   - "--storage.tsdb.path=/prometheus"
+          ports:
+            - name: http
+              containerPort: {{ .Values.prometheus.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.prometheus.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.prometheus.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+      volumes:
+        - name: prometheus-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-prometheus-pvc
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-prometheus-config

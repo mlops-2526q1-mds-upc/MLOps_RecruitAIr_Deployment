@@ -1,0 +1,25 @@
+# Configmap for the prometheus server (prometheus.yml)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-prometheus-config
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 10s
+      evaluation_interval: 10s
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:{{ .Values.prometheus.service.port }}']
+
+      - job_name: 'evaluator-api'
+        static_configs:
+          - targets: ['{{ .Release.Name }}-evaluator-api:{{ .Values.evaluator.service.port }}']
+
+      - job_name: 'extractor-api'
+        static_configs:
+          - targets: ['{{ .Release.Name }}-extractor-api:{{ .Values.extractor.api.service.port }}']
