@@ -59,7 +59,7 @@ evaluator:
 evaluator:
   image:
     repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/evaluator-api
-    tag: "0.1.3"
+    tag: "0.2.0"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -88,7 +88,7 @@ extractor:
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/extractor-api
-      tag: "0.1.0"
+      tag: "0.2.0"
       pullPolicy: IfNotPresent
     service:
       type: ClusterIP
