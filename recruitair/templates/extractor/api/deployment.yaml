@@ -29,7 +29,7 @@ spec:
           env:
             - name: OLLAMA_HOST
               value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
-          command: ['sh', '-c', 'ollama pull {{ .Values.extractor.model.name }}']
+          command: ['sh', '-c', 'ollama pull {{ .Values.extractor.model.name }}:{{ .Values.extractor.model.version }}']
       containers:
         - name: extractor-api
           image: "{{ .Values.extractor.api.image.repository }}:{{ .Values.extractor.api.image.tag | default .Chart.AppVersion }}"
