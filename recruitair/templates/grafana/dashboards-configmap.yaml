@@ -2,9 +2,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-prometheus-config
+  name: {{ .Release.Name }}-grafana-dashboards-config
   labels:
     {{- include "..labels" . | nindent 4 }}
 data:
-  prometheus.yml: |
-    {{- .Files.Get "config/prometheus/prometheus.yml" | indent 4 }}
+  {{- (.Files.Glob "config/grafana/dashboards/*.json").AsConfig | nindent 2 }}

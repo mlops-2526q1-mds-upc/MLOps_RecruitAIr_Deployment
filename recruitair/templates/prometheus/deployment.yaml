@@ -33,23 +33,25 @@ spec:
               readOnly: true
           # command:
           #   - "/bin/prometheus"
-          # args:
-          #   - "--config.file=/etc/prometheus/prometheus.yml"
-          #   - "--storage.tsdb.path=/prometheus"
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--web.route-prefix=/prometheus"
+            - "--web.external-url=/prometheus"
           ports:
             - name: http
               containerPort: {{ .Values.prometheus.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /prometheus
               port: {{ .Values.prometheus.service.port }}
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /prometheus
               port: {{ .Values.prometheus.service.port }}
               scheme: HTTP
             initialDelaySeconds: 10

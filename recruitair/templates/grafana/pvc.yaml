@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-grafana-pvc
+  labels:
+    app.kubernetes.io/name: grafana
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ default "10Gi" .Values.grafana.persistence.size }}
+  storageClassName: {{ .Values.grafana.persistence.storageClass }}

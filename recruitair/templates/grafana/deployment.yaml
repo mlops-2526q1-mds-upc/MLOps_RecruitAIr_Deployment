@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-grafana
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-grafana
+      {{- include "..selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}-grafana
+        {{- include "..labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: grafana
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
+          volumeMounts:
+            - name: grafana-provisioning
+              mountPath: /etc/grafana/provisioning
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+            - name: grafana-dashboards
+              mountPath: /opt/grafana-dashboards
+          env:
+            - name: GF_SERVER_ROOT_URL
+              value: "%(protocol)s://%(domain)s/grafana/"
+            - name: GF_SERVER_SERVE_FROM_SUB_PATH
+              value: "true"
+          ports:
+            - name: http
+              containerPort: {{ .Values.grafana.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /grafana/
+              port: {{ .Values.grafana.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /grafana/
+              port: {{ .Values.grafana.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+      volumes:
+        - name: grafana-provisioning
+          configMap:
+            name: {{ .Release.Name }}-grafana-provisioning-config
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-grafana-pvc
+        - name: grafana-dashboards
+          configMap:
+            name: {{ .Release.Name }}-grafana-dashboards-config

@@ -148,12 +148,31 @@ prometheus:
     type: ClusterIP
     port: 9090
   ingress:
-    enabled: false
+    enabled: true
     host: localhost
     prefix: /prometheus
     tls:
       enabled: false
       # secretName: prometheus-tls
+  persistence:
+    size: 10Gi
+    storageClass: "standard"
+
+grafana:
+  image:
+    repository: grafana/grafana
+    tag: "12.1"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  ingress:
+    enabled: true
+    host: localhost
+    prefix: /grafana
+    tls:
+      enabled: false
+      # secretName: grafana-tls
   persistence:
     size: 10Gi
     storageClass: "standard"
