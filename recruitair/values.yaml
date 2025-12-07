@@ -57,6 +57,7 @@ evaluator:
     port: 8082
 
 evaluator:
+  awsSecret: aws-creds # Comment this out if running inside AWS, thus using IAM roles.
   image:
     repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/evaluator-api
     tag: "0.2.0"

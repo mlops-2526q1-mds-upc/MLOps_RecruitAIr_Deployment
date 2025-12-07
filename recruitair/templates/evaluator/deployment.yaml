@@ -30,6 +30,23 @@ spec:
               value: {{ .Values.evaluator.model.name }}
             - name: RECRUITAIR_MODEL_VERSION
               value: {{ .Values.evaluator.model.version | quote }}
+          {{- if .Values.evaluator.awsSecret }}
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.evaluator.awsSecret }}
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.evaluator.awsSecret }}
+                  key: aws-secret-access-key
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.evaluator.awsSecret }}
+                  key: aws-region
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.evaluator.service.port }}
