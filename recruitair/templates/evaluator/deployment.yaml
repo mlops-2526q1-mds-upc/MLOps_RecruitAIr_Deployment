@@ -47,6 +47,9 @@ spec:
                   name: {{ .Values.evaluator.awsSecret }}
                   key: aws-region
           {{- end }}
+          volumeMounts:
+            - name: evaluator-api-cache
+              mountPath: /home/appuser/.cache/recruitair
           ports:
             - name: http
               containerPort: {{ .Values.evaluator.service.port }}
@@ -65,3 +68,17 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
+          startupProbe:
+            # Give the container some time to start up, especially when loading the model for the first time
+            httpGet:
+              path: /health
+              port: {{ .Values.evaluator.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            failureThreshold: 60 # 10 minutes
+            periodSeconds: 10
+
+      volumes:
+        - name: evaluator-api-cache
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-evaluator-api-pvc
