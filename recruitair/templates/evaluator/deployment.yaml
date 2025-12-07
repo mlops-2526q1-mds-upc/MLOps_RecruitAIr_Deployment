@@ -30,6 +30,8 @@ spec:
               value: {{ .Values.evaluator.model.name }}
             - name: RECRUITAIR_MODEL_VERSION
               value: {{ .Values.evaluator.model.version | quote }}
+            - name: RECRUITAIR_API_ROOT_PATH
+              value: {{ .Values.evaluator.ingress.prefix | default "" | quote }}
           {{- if .Values.evaluator.awsSecret }}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:

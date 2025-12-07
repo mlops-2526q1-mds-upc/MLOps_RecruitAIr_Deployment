@@ -47,6 +47,8 @@ spec:
               value: {{ .Values.extractor.model.version | quote }}
             - name: RECRUITAIR_OLLAMA_BASE_URL
               value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
+            - name: RECRUITAIR_API_ROOT_PATH
+              value: {{ .Values.extractor.api.ingress.prefix | default "" | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.extractor.api.service.port }}

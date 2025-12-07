@@ -60,7 +60,7 @@ evaluator:
   awsSecret: aws-creds # Comment this out if running inside AWS, thus using IAM roles.
   image:
     repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/evaluator-api
-    tag: "0.2.0"
+    tag: "0.2.1"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -95,7 +95,7 @@ extractor:
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/extractor-api
-      tag: "0.2.0"
+      tag: "0.2.1"
       pullPolicy: IfNotPresent
     service:
       type: ClusterIP
@@ -126,7 +126,7 @@ extractor:
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
     ingress:
-      enabled: false
+      enabled: true
       host: localhost
       prefix: /ollama
       tls:
