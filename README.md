@@ -42,6 +42,8 @@ helm install recruitair ./recruitair -n recruitair --wait
 
 ## Using EKS
 
+> [!IMPORTANT]
+> In the free-tier of AWS, the resource limits for EKS Worker Nodes are really low (2 vCPU and 1GB RAM). Therefore, to run the full RecruitAIr stack, we would need to upgrade our instance types to at least t3.medium or larger. This would incur costs beyond the free-tier limits. For that reason, it is recommended to use Kind for local deployments. However, if you still want to proceed with EKS, follow the steps below.
 
 1. Install [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/installation.html) to create a local Kubernetes cluster.
 2. Install [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) to interact with your Kubernetes cluster.
