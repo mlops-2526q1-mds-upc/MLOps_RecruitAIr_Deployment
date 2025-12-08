@@ -35,7 +35,7 @@
             ]
         },
         {
-            "type": "timeSeries",
+            "type": "timeseries",
             "title": "p95 /eval Latency (s)",
             "id": 3,
             "datasource": {
@@ -50,7 +50,7 @@
             ]
         },
         {
-            "type": "timeSeries",
+            "type": "timeseries",
             "title": "Model Evaluation Latency (p95, s)",
             "id": 4,
             "datasource": {
@@ -65,7 +65,7 @@
             ]
         },
         {
-            "type": "timeSeries",
+            "type": "timeseries",
             "title": "Offer Text Length (avg chars)",
             "id": 5,
             "datasource": {

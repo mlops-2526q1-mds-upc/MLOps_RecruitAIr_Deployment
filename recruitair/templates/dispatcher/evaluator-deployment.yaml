@@ -71,3 +71,11 @@ spec:
               #   secretKeyRef:
               #     name: {{ .Release.Name }}-evaluator-secret
               #     key: evaluator-api-bearer-token
+            - name: RECRUITAIR_EXPOSE_METRICS
+              value: "{{ .Values.dispatcher.evaluator.metrics.enabled }}"
+            - name: RECRUITAIR_METRICS_SERVER_PORT
+              value: "{{ .Values.dispatcher.evaluator.metrics.service.port }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.dispatcher.evaluator.metrics.service.port }}
+              protocol: TCP

@@ -71,3 +71,11 @@ spec:
               #   secretKeyRef:
               #     name: {{ .Release.Name }}-extractor-secret
               #     key: extractor-api-bearer-token
+            - name: RECRUITAIR_EXPOSE_METRICS
+              value: "{{ .Values.dispatcher.extractor.metrics.enabled }}"
+            - name: RECRUITAIR_METRICS_SERVER_PORT
+              value: "{{ .Values.dispatcher.extractor.metrics.service.port }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.dispatcher.extractor.metrics.service.port }}
+              protocol: TCP
