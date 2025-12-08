@@ -24,11 +24,12 @@ scrape_configs:
   - job_name: "dispatcher-extractor-worker"
     metrics_path: /metrics
     static_configs:
-      - targets: ["{{ .Release.Name }}-dispatcher-extractor:{{ .Values.dispatcher.extractor.metrics.service.port }}"]
+      - targets: ["{{ .Release.Name }}-dispatcher-extractor-metrics:{{ .Values.dispatcher.extractor.metrics.service.port }}"]
 {{- end }}
+
 {{- if .Values.dispatcher.evaluator.metrics.enabled }}
   - job_name: "dispatcher-evaluator-worker"
     metrics_path: /metrics
     static_configs:
-      - targets: ["{{ .Release.Name }}-dispatcher-evaluator:{{ .Values.dispatcher.evaluator.metrics.service.port }}"]
+      - targets: ["{{ .Release.Name }}-dispatcher-evaluator-metrics:{{ .Values.dispatcher.evaluator.metrics.service.port }}"]
 {{- end }}

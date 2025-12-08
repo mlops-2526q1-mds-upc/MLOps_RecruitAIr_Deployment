@@ -19,7 +19,7 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 1,
+    "id": 3,
     "links": [],
     "panels": [
         {
@@ -84,7 +84,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -160,7 +160,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -236,7 +236,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -312,7 +312,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -376,7 +376,7 @@
                 "textMode": "value",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "datasource": {
@@ -443,7 +443,7 @@
                 "textMode": "auto",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "builder",
@@ -506,7 +506,7 @@
                 "textMode": "auto",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "builder",
@@ -569,7 +569,7 @@
                 "textMode": "auto",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "builder",
@@ -632,7 +632,7 @@
                 "textMode": "auto",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "builder",
@@ -695,7 +695,7 @@
                 "textMode": "auto",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -758,7 +758,7 @@
                 "textMode": "auto",
                 "wideLayout": true
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -833,7 +833,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -909,7 +909,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -988,7 +988,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1077,7 +1077,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1153,7 +1153,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1229,7 +1229,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1267,7 +1267,8 @@
                                 "value": 80
                             }
                         ]
-                    }
+                    },
+                    "unit": "s"
                 },
                 "overrides": []
             },
@@ -1291,7 +1292,7 @@
                 "showThresholdMarkers": true,
                 "sizing": "auto"
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1328,7 +1329,8 @@
                                 "value": 80
                             }
                         ]
-                    }
+                    },
+                    "unit": "s"
                 },
                 "overrides": []
             },
@@ -1352,7 +1354,7 @@
                 "showThresholdMarkers": true,
                 "sizing": "auto"
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1437,7 +1439,7 @@
                     "reverse": false
                 }
             },
-            "pluginVersion": "12.3.0",
+            "pluginVersion": "12.1.4",
             "targets": [
                 {
                     "editorMode": "code",
@@ -1453,7 +1455,7 @@
         }
     ],
     "preload": false,
-    "schemaVersion": 42,
+    "schemaVersion": 41,
     "tags": [],
     "templating": {
         "list": []
