@@ -54,7 +54,7 @@ wheels = [
 ]
 
 [[package]]
-name = "aws-cdk-lambda-layer-kubectl-v33"
+name = "aws-cdk-lambda-layer-kubectl-v34"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
@@ -64,14 +64,14 @@ dependencies = [
     { name = "publication" },
     { name = "typeguard" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7e/f7/ea0e0ae0ea6f94072adf3c10c05143d5cbb36219e5ace16ed861716f29d4/aws_cdk_lambda_layer_kubectl_v33-2.0.0.tar.gz", hash = "sha256:529ec271b07eab210f3a62742717c0e4d5ce8cbd3edafedca2ddcbf594307157", size = 35280499, upload-time = "2025-05-20T20:58:25.503Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/20/58bf65fa53955921cccb0159065c63b60d8317d5594f528d673e536eccd0/aws_cdk_lambda_layer_kubectl_v34-2.0.0.tar.gz", hash = "sha256:fc29612f70c4f737b03a6757c3f5c922c5ce8e1e4938317b86248a0e8be3a34e", size = 35601596, upload-time = "2025-10-17T10:34:41.364Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/ed/fabea660899dbc3bab094582c228d7d9c82b9b0b24404d55ffe0379454e1/aws_cdk_lambda_layer_kubectl_v33-2.0.0-py3-none-any.whl", hash = "sha256:a8812f00c61f8efe3644e4c858b640a1680fbdb5e5a6c6e10d69ef11b6074228", size = 35279865, upload-time = "2025-05-20T20:58:22.489Z" },
+    { url = "https://files.pythonhosted.org/packages/80/5f/cc5035ae6f3631ddd72f49a5012dd31aef7d378aebaf9b98a8ea675bf889/aws_cdk_lambda_layer_kubectl_v34-2.0.0-py3-none-any.whl", hash = "sha256:f47930aa303eea73f998c34e14379accb1dd2dfbecf2c27b8e40ae3ff35b1082", size = 35600553, upload-time = "2025-10-17T10:34:38.772Z" },
 ]
 
 [[package]]
 name = "aws-cdk-lib"
-version = "2.215.0"
+version = "2.232.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aws-cdk-asset-awscli-v1" },
@@ -82,9 +82,9 @@ dependencies = [
     { name = "publication" },
     { name = "typeguard" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b2/4b/93b7f6d155c0d926989f6641e26d887afe481ec1414be219c31411cecace/aws_cdk_lib-2.215.0.tar.gz", hash = "sha256:82da916b55070f7fc8a11a28f47afb6f7e34b452be7d7a4d7fdbf8e4e77ea768", size = 44003915, upload-time = "2025-09-15T16:10:35.598Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4e/55/86d9b1c51a81eafcefa53c6429ebeaa3cf8ab75c56692b79cb691de3ffd8/aws_cdk_lib-2.232.1.tar.gz", hash = "sha256:08bd5e4966b07fb1de47012a3007457859a53b32d4b0c5437a5c64701bae2bcb", size = 46579959, upload-time = "2025-12-06T01:17:41.393Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/17/a9249cd01895cb9da1512bb6cc807850e794ecf1f3ef9a9b1f5711493b51/aws_cdk_lib-2.215.0-py3-none-any.whl", hash = "sha256:f609a88a6fe252dc5a0629393567942ec7f0c2aef1ef350c911cd9165b50bee5", size = 44258884, upload-time = "2025-09-15T16:10:00.807Z" },
+    { url = "https://files.pythonhosted.org/packages/e9/88/a36f77b7f20bb263d3ee8beed539fbedc46b2417f0feccac60fb7303086c/aws_cdk_lib-2.232.1-py3-none-any.whl", hash = "sha256:d664518ee10391a867c1e5b6633085b7a02acea4bf738ed250bb77e1a0936a69", size = 47226237, upload-time = "2025-12-06T01:17:03.773Z" },
 ]
 
 [[package]]
@@ -146,7 +146,7 @@ name = "mlops-recruitair-deployment"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "aws-cdk-lambda-layer-kubectl-v33" },
+    { name = "aws-cdk-lambda-layer-kubectl-v34" },
     { name = "aws-cdk-lib" },
     { name = "constructs" },
     { name = "pyyaml" },
@@ -154,8 +154,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aws-cdk-lambda-layer-kubectl-v33", specifier = ">=2.0.0" },
-    { name = "aws-cdk-lib", specifier = "==2.215.0" },
+    { name = "aws-cdk-lambda-layer-kubectl-v34", specifier = ">=2.0.0" },
+    { name = "aws-cdk-lib", specifier = ">=2.232.1" },
     { name = "constructs", specifier = ">=10.0.0,<11.0.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
 ]
