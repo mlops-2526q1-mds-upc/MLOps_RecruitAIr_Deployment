@@ -4,19 +4,33 @@ dispatcher:
     name: dispatcher_db
     username: dispatcher_user
   evaluator:
+    httpTimeout: 30
+    batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
+    metrics:
+      enabled: true
+      service:
+        type: ClusterIP
+        port: 8000
   extractor:
+    httpTimeout: 180 # Three minutes. Because in local testing, docker is slow to respond.
+    batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-extractor
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
+    metrics:
+      enabled: true
+      service:
+        type: ClusterIP
+        port: 8000
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-api
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
     service:
       type: ClusterIP
@@ -43,7 +57,7 @@ dispatcher:
   migration:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-migration
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
 postgres:
   adminSecretName: postgres-secret
@@ -64,9 +78,10 @@ evaluator:
     port: 8082
 
 evaluator:
+  awsSecret: aws-creds # Comment this out if running inside AWS, thus using IAM roles.
   image:
     repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/evaluator-api
-    tag: "0.1.3"
+    tag: "0.2.1"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -77,9 +92,12 @@ evaluator:
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
   ingress:
-    enabled: false
+    enabled: true
     host: localhost
     prefix: /evaluator
+    tls:
+      enabled: false
+      # secretName: evaluator-api-tls
   model:
     name: criteria-evaluation
     version: "1"
@@ -90,6 +108,9 @@ evaluator:
     limits:
       memory: "512Mi"
       cpu: "200m"
+  cache:
+    size: 5Gi
+    storageClass: "standard"
 
 extractor:
   model:
@@ -101,7 +122,7 @@ extractor:
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/extractor-api
-      tag: "0.1.0"
+      tag: "0.2.1"
       pullPolicy: IfNotPresent
     service:
       type: ClusterIP
@@ -112,9 +133,11 @@ extractor:
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
     ingress:
-      enabled: false
+      enabled: true
       host: ""
       prefix: /extractor
+      tls:
+        enabled: false
     resources:
       requests:
         memory: "256Mi"
@@ -136,9 +159,12 @@ extractor:
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
     ingress:
-      enabled: false
+      enabled: true
       host: ""
       prefix: /ollama
+      tls:
+        enabled: false
+        # secretName: extractor-ollama-tls
     persistence:
       size: 10Gi
       storageClass: "standard"
@@ -148,3 +174,42 @@ mlflow:
 
 ingress:
   className: alb
+
+prometheus:
+  image:
+    repository: prom/prometheus
+    tag: "v3.8.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 9090
+  ingress:
+    enabled: false
+    host: localhost
+    prefix: /prometheus
+    tls:
+      enabled: false
+      # secretName: prometheus-tls
+  persistence:
+    size: 10Gi
+    storageClass: "standard"
+
+grafana:
+  adminCredentialsSecretName: grafana-admin-credentials
+  image:
+    repository: grafana/grafana
+    tag: "12.1"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  ingress:
+    enabled: true
+    host: localhost
+    prefix: /grafana
+    tls:
+      enabled: false
+      # secretName: grafana-tls
+  persistence:
+    size: 10Gi
+    storageClass: "standard"

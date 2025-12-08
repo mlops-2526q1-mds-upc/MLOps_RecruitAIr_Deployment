@@ -29,7 +29,7 @@ spec:
           env:
             - name: OLLAMA_HOST
               value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
-          command: ['sh', '-c', 'ollama pull {{ .Values.extractor.model.name }}']
+          command: ['sh', '-c', 'ollama pull {{ .Values.extractor.model.name }}:{{ .Values.extractor.model.version }}']
       containers:
         - name: extractor-api
           image: "{{ .Values.extractor.api.image.repository }}:{{ .Values.extractor.api.image.tag | default .Chart.AppVersion }}"
@@ -47,6 +47,8 @@ spec:
               value: {{ .Values.extractor.model.version | quote }}
             - name: RECRUITAIR_OLLAMA_BASE_URL
               value: http://{{ .Release.Name }}-extractor-ollama:{{ .Values.extractor.ollama.service.port }}
+            - name: RECRUITAIR_API_ROOT_PATH
+              value: {{ .Values.extractor.api.ingress.prefix | default "" | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.extractor.api.service.port }}

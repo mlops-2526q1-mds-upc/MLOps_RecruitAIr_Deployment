@@ -30,6 +30,28 @@ spec:
               value: {{ .Values.evaluator.model.name }}
             - name: RECRUITAIR_MODEL_VERSION
               value: {{ .Values.evaluator.model.version | quote }}
+            - name: RECRUITAIR_API_ROOT_PATH
+              value: {{ .Values.evaluator.ingress.prefix | default "" | quote }}
+          {{- if .Values.evaluator.awsSecret }}
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.evaluator.awsSecret }}
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.evaluator.awsSecret }}
+                  key: aws-secret-access-key
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.evaluator.awsSecret }}
+                  key: aws-region
+          {{- end }}
+          volumeMounts:
+            - name: evaluator-api-cache
+              mountPath: /home/appuser/.cache/recruitair
           ports:
             - name: http
               containerPort: {{ .Values.evaluator.service.port }}
@@ -50,3 +72,17 @@ spec:
             periodSeconds: 10
           resources:
             {{- toYaml .Values.evaluator.resources | nindent 12 }}
+          startupProbe:
+            # Give the container some time to start up, especially when loading the model for the first time
+            httpGet:
+              path: /health
+              port: {{ .Values.evaluator.service.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            failureThreshold: 60 # 10 minutes
+            periodSeconds: 10
+
+      volumes:
+        - name: evaluator-api-cache
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-evaluator-api-pvc

@@ -25,7 +25,17 @@ kubectl create secret docker-registry regcred --docker-server=ghcr.io --docker-u
 kubectl create secret generic postgres-secret --from-literal=postgres-password=<some_password> --from-literal=postgres-username=<some_username> -n recruitair
 ```
     Replace `<your-name>` and `<your-pword>` with your GitHub Container Registry credentials. Replace `<some_password>` and `<some_username>` with your desired values for the Postgres admin login.
-9. Finally, install the Helm chart:
+9. If running in kind locally, create the AWS credentials secret:
+```bash
+kubectl -n recruitair create secret generic aws-creds --from-literal=aws-access-key-id=<your_access_key_id> --from-literal=aws-secret-access-key=<your_secret_access_key> --from-literal=aws-region=eu-north-1
+```
+    Replace `<your_access_key_id>` and `<your_secret_access_key>` with your AWS credentials. If running inside AWS, you can skip this step and comment out the `awsSecret` field in `values.yaml`.
+10. Create the Grafana admin secret:
+```bash
+kubectl -n recruitair create secret generic grafana-admin-credentials --from-literal=admin-user=<grafana_admin_user> --from-literal=admin-password=<grafana_admin_password>
+```
+    Replace `<grafana_admin_user>` and `<grafana_admin_password>` with your desired Grafana admin credentials.
+11. Finally, install the Helm chart:
 ```bash
 helm install recruitair ./recruitair -n recruitair --wait
 ```

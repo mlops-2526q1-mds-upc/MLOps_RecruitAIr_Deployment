@@ -1,0 +1,16 @@
+# Persistent Volume Claim for the Cache of the Evaluator API
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-evaluator-api-pvc
+  labels:
+    app.kubernetes.io/name: evaluator-api
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ default "5Gi" .Values.evaluator.cache.size }}
+  storageClassName: {{ .Values.evaluator.cache.storageClass }}

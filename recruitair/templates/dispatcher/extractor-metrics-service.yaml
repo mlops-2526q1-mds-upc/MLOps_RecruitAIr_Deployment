@@ -1,0 +1,18 @@
+{{- if .Values.dispatcher.evaluator.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-dispatcher-evaluator-metrics
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.dispatcher.evaluator.metrics.service.type }}
+  ports:
+    - port: {{ .Values.dispatcher.evaluator.metrics.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}-dispatcher-evaluator
+    {{- include "..selectorLabels" . | nindent 4 }}
+{{- end }}

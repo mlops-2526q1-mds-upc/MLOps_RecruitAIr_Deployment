@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-prometheus-config
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+data:
+  {{- range $path, $bytes := .Files.Glob "config/prometheus/*.yml" }}
+  {{- $name := base $path }}
+  {{ $name }}: |-
+{{ tpl ($bytes | toString) $ | nindent 4 }}
+  {{- end }}

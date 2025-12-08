@@ -1,0 +1,13 @@
+# Configmap for the prometheus server (prometheus.yml)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-grafana-provisioning-datasources-config
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+data:
+  {{- range $path, $bytes := .Files.Glob "config/grafana/provisioning/datasources/*.yaml" }}
+  {{- $name := base $path }}
+  {{ $name }}: |-
+{{ tpl ($bytes | toString) $ | nindent 4 }}
+  {{- end }}
