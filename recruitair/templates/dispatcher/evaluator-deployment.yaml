@@ -63,6 +63,8 @@ spec:
           imagePullPolicy: {{ .Values.dispatcher.evaluator.image.pullPolicy }}
           env:
             {{- include "dispatcher.env" . | nindent 12 }}
+            - name: RECRUITAIR_HTTP_TIMEOUT
+              value: "{{ .Values.dispatcher.evaluator.httpTimeout }}"
             - name: RECRUITAIR_EVALUATOR_API_BASE_URL
               value: "http://{{ .Release.Name }}-evaluator-api:{{ .Values.evaluator.service.port }}"
             - name: RECRUITAIR_EVALUATOR_API_BEARER_TOKEN
