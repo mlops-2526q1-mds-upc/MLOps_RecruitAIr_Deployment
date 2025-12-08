@@ -1,0 +1,31 @@
+{{- if .Values.frontend.enabled }}
+{{- if .Values.frontend.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-frontend
+  labels:
+    {{- include "..labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.frontend.ingress.host }}
+    http:
+      paths:
+      - path: {{ printf "%s(/|$)(.*)" (.Values.frontend.ingress.prefix | default "/api") }} 
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ .Release.Name }}-frontend
+            port:
+              number: {{ .Values.frontend.service.port }}
+  {{- if .Values.frontend.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.frontend.ingress.host }}
+    secretName: {{ .Values.frontend.ingress.tls.secretName }}
+  {{- end }}
+{{- end }}
+{{- end }}
