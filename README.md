@@ -39,3 +39,43 @@ kubectl -n recruitair create secret generic grafana-admin-credentials --from-lit
 ```bash
 helm install recruitair ./recruitair -n recruitair --wait
 ```
+
+## Using EKS
+
+
+1. Install [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/installation.html) to create a local Kubernetes cluster.
+2. Install [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) to interact with your Kubernetes cluster.
+3. Install [Helm](https://helm.sh/docs/intro/install/) to manage Kubernetes applications.
+4. Clone this repository and navigate to the cloned repository directory.
+5. Create an EKS cluster using the provided configuration file:
+```bash
+eksctl create cluster -f eks.config.yaml
+```
+6. Apply the ingress controller:
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+```
+7. Create a namespace for the RecruitAIr application:
+```bash
+kubectl create namespace recruitair
+```
+8. Create the image pull secret and the database admin secret:
+```bash
+kubectl create secret docker-registry regcred --docker-server=ghcr.io --docker-username=<your-name> --docker-password=<your-pword> -n recruitair
+kubectl create secret generic postgres-secret --from-literal=postgres-password=<some_password> --from-literal=postgres-username=<some_username> -n recruitair
+```
+    Replace `<your-name>` and `<your-pword>` with your GitHub Container Registry credentials. Replace `<some_password>` and `<some_username>` with your desired values for the Postgres admin login.
+9. If running in kind locally, create the AWS credentials secret:
+```bash
+kubectl -n recruitair create secret generic aws-creds --from-literal=aws-access-key-id=<your_access_key_id> --from-literal=aws-secret-access-key=<your_secret_access_key> --from-literal=aws-region=eu-north-1
+```
+    Replace `<your_access_key_id>` and `<your_secret_access_key>` with your AWS credentials. If running inside AWS, you can skip this step and comment out the `awsSecret` field in `values.yaml`.
+10.  Create the Grafana admin secret:
+```bash
+kubectl -n recruitair create secret generic grafana-admin-credentials --from-literal=admin-user=<grafana_admin_user> --from-literal=admin-password=<grafana_admin_password>
+```
+    Replace `<grafana_admin_user>` and `<grafana_admin_password>` with your desired Grafana admin credentials.
+11.  Finally, install the Helm chart:
+```bash
+helm install recruitair ./recruitair -n recruitair --wait
+```
