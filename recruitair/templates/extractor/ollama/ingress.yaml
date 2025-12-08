@@ -10,10 +10,10 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.extractor.ollama.ingress.host }}
-    http:
+  - http:
       paths:
-      - path: {{ printf "%s(/|$)(.*)" (.Values.extractor.ollama.ingress.prefix | default "/api") }} 
+      {{- $prefix := .Values.extractor.ollama.ingress.prefix | default "/api" }}
+      - path: {{ if eq .Values.ingress.className "alb" }}{{ printf "%s*" $prefix }}{{ else }}{{ printf "%s(/|$)(.*)" $prefix }}{{ end }}
         pathType: ImplementationSpecific
         backend:
           service:

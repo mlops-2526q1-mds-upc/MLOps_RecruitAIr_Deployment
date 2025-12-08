@@ -19,10 +19,10 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.extractor.api.ingress.host }}
-    http:
+  - http:
       paths:
-      - path: {{ printf "%s(/|$)(.*)" (.Values.extractor.api.ingress.prefix | default "/api") }}
+      {{- $prefix := .Values.extractor.api.ingress.prefix | default "/api" }}
+      - path: {{ if eq .Values.ingress.className "alb" }}{{ printf "%s*" $prefix }}{{ else }}{{ printf "%s(/|$)(.*)" $prefix }}{{ end }}
         pathType: ImplementationSpecific
         backend:
           service:

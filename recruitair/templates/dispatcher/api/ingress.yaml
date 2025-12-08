@@ -19,10 +19,10 @@ metadata:
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
-  - host: {{ .Values.dispatcher.api.ingress.host }}
-    http:
+  - http:
       paths:
-      - path: {{ printf "%s(/|$)(.*)" (.Values.dispatcher.api.ingress.prefix | default "/api") }}
+      {{- $prefix := .Values.dispatcher.api.ingress.prefix | default "/api" }}
+      - path: {{ if eq .Values.ingress.className "alb" }}{{ printf "%s*" $prefix }}{{ else }}{{ printf "%s(/|$)(.*)" $prefix }}{{ end }}
         pathType: ImplementationSpecific
         backend:
           service:

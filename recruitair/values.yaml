@@ -28,11 +28,18 @@ dispatcher:
       targetMemoryUtilizationPercentage: 80
     ingress:
       enabled: true
-      host: localhost
+      host: ""
       prefix: /api
       tls:
         enabled: false
         # secretName: dispatcher-api-tls
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
   migration:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-migration
@@ -76,7 +83,13 @@ evaluator:
   model:
     name: criteria-evaluation
     version: "1"
-
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
 
 extractor:
   model:
@@ -100,8 +113,15 @@ extractor:
       targetMemoryUtilizationPercentage: 80
     ingress:
       enabled: false
-      host: localhost
+      host: ""
       prefix: /extractor
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
   ollama:
     image:
       repository: ollama/ollama
@@ -117,7 +137,7 @@ extractor:
       targetMemoryUtilizationPercentage: 80
     ingress:
       enabled: false
-      host: localhost
+      host: ""
       prefix: /ollama
     persistence:
       size: 10Gi

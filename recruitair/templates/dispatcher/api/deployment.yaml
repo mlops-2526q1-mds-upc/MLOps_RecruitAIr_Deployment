@@ -79,3 +79,5 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
+          resources:
+            {{- toYaml .Values.dispatcher.api.resources | nindent 12 }}
