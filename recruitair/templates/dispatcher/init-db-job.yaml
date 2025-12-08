@@ -1,20 +1,3 @@
-{{- $existing := lookup "v1" "Secret" .Release.Namespace (include "dispatcher.secretName" .) -}}
-
-{{- if not $existing }}
-# generated once at template render time and stored in the cluster; base64 encoded
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ include "dispatcher.secretName" . }}
-  labels:
-    {{- include "..labels" . | nindent 4 }}
-type: Opaque
-data:
-  postgres-username: {{ include "dispatcher.dbUsername" . | b64enc }}
-  postgres-password: {{ randAlphaNum 32 | b64enc }}
----
-{{- end }}
-
 apiVersion: batch/v1
 kind: Job
 metadata:
