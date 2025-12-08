@@ -26,7 +26,7 @@ dispatcher:
     name: dispatcher_db
     username: dispatcher_user
   evaluator:
-    httpTimeout: 30
+    httpTimeout: 180 # Three minutes, just for the demo.
     batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
@@ -38,7 +38,7 @@ dispatcher:
         type: ClusterIP
         port: 8000
   extractor:
-    httpTimeout: 180 # Three minutes. Because in local testing, docker is slow to respond.
+    httpTimeout: 1800 # Thirty minutes, just for the demo. Because in local testing, docker is slow to respond.
     batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-extractor
