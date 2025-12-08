@@ -4,19 +4,33 @@ dispatcher:
     name: dispatcher_db
     username: dispatcher_user
   evaluator:
+    httpTimeout: 30
+    batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
+    metrics:
+      enabled: true
+      service:
+        type: ClusterIP
+        port: 8000
   extractor:
+    httpTimeout: 180 # Three minutes. Because in local testing, docker is slow to respond.
+    batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-extractor
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
+    metrics:
+      enabled: true
+      service:
+        type: ClusterIP
+        port: 8000
   api:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-api
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
     service:
       type: ClusterIP
@@ -36,7 +50,7 @@ dispatcher:
   migration:
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-migration
-      tag: "0.2.3"
+      tag: "0.3.0"
       pullPolicy: IfNotPresent
 postgres:
   adminSecretName: postgres-secret

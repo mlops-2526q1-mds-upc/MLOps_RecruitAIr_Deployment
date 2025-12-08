@@ -14,3 +14,22 @@ scrape_configs:
   - job_name: "extractor-api"
     static_configs:
       - targets: ["{{ .Release.Name }}-extractor-api:{{ .Values.extractor.api.service.port }}"]
+
+  - job_name: "dispatcher-api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["{{ .Release.Name }}-dispatcher-api:{{ .Values.dispatcher.api.service.port }}"]
+
+{{- if .Values.dispatcher.extractor.metrics.enabled }}
+  - job_name: "dispatcher-extractor-worker"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["{{ .Release.Name }}-dispatcher-extractor-metrics:{{ .Values.dispatcher.extractor.metrics.service.port }}"]
+{{- end }}
+
+{{- if .Values.dispatcher.evaluator.metrics.enabled }}
+  - job_name: "dispatcher-evaluator-worker"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["{{ .Release.Name }}-dispatcher-evaluator-metrics:{{ .Values.dispatcher.evaluator.metrics.service.port }}"]
+{{- end }}

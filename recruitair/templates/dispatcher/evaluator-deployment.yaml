@@ -63,6 +63,10 @@ spec:
           imagePullPolicy: {{ .Values.dispatcher.evaluator.image.pullPolicy }}
           env:
             {{- include "dispatcher.env" . | nindent 12 }}
+            - name: RECRUITAIR_HTTP_TIMEOUT
+              value: "{{ .Values.dispatcher.evaluator.httpTimeout }}"
+            - name: RECRUITAIR_BATCH_SIZE
+              value: "{{ .Values.dispatcher.evaluator.batchSize }}"
             - name: RECRUITAIR_EVALUATOR_API_BASE_URL
               value: "http://{{ .Release.Name }}-evaluator-api:{{ .Values.evaluator.service.port }}"
             - name: RECRUITAIR_EVALUATOR_API_BEARER_TOKEN
@@ -71,3 +75,11 @@ spec:
               #   secretKeyRef:
               #     name: {{ .Release.Name }}-evaluator-secret
               #     key: evaluator-api-bearer-token
+            - name: RECRUITAIR_EXPOSE_METRICS
+              value: "{{ .Values.dispatcher.evaluator.metrics.enabled }}"
+            - name: RECRUITAIR_METRICS_SERVER_PORT
+              value: "{{ .Values.dispatcher.evaluator.metrics.service.port }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.dispatcher.evaluator.metrics.service.port }}
+              protocol: TCP
