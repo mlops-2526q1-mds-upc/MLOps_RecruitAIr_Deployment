@@ -6,24 +6,27 @@ metadata:
   labels:
     {{- include "..labels" . | nindent 4 }}
   annotations:
+    {{- if eq .Values.ingress.className "alb" }}
+    # AWS ALB Annotations
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: recruitair-group
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    {{- else }}
+    # Nginx (Local) Annotations
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- end }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
-  - host: {{ .Values.dispatcher.api.ingress.host }}
-    http:
+  - http:
       paths:
-      - path: {{ printf "%s(/|$)(.*)" (.Values.dispatcher.api.ingress.prefix | default "/api") }} 
+      {{- $prefix := .Values.dispatcher.api.ingress.prefix | default "/api" }}
+      - path: {{ if eq .Values.ingress.className "alb" }}{{ printf "%s*" $prefix }}{{ else }}{{ printf "%s(/|$)(.*)" $prefix }}{{ end }}
         pathType: ImplementationSpecific
         backend:
           service:
             name: {{ .Release.Name }}-dispatcher-api
             port:
               number: {{ .Values.dispatcher.api.service.port }}
-  {{- if .Values.dispatcher.api.ingress.tls.enabled }}
-  tls:
-  - hosts:
-    - {{ .Values.dispatcher.api.ingress.host }}
-    secretName: {{ .Values.dispatcher.api.ingress.tls.secretName }}
-  {{- end }}
 {{- end }}
