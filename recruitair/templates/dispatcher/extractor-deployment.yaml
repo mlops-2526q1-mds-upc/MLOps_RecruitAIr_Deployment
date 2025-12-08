@@ -65,6 +65,8 @@ spec:
             {{- include "dispatcher.env" . | nindent 12 }}
             - name: RECRUITAIR_HTTP_TIMEOUT
               value: "{{ .Values.dispatcher.extractor.httpTimeout }}"
+            - name: RECRUITAIR_BATCH_SIZE
+              value: "{{ .Values.dispatcher.extractor.batchSize }}"
             - name: RECRUITAIR_EXTRACTOR_API_BASE_URL
               value: "http://{{ .Release.Name }}-extractor-api:{{ .Values.extractor.api.service.port }}"
             - name: RECRUITAIR_EXTRACTOR_API_BEARER_TOKEN

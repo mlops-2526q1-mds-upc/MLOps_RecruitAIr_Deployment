@@ -5,6 +5,7 @@ dispatcher:
     username: dispatcher_user
   evaluator:
     httpTimeout: 30
+    batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-evaluator
       tag: "0.3.0"
@@ -16,6 +17,7 @@ dispatcher:
         port: 8000
   extractor:
     httpTimeout: 180 # Three minutes. Because in local testing, docker is slow to respond.
+    batchSize: 1
     image:
       repository: ghcr.io/mlops-2526q1-mds-upc/recruitair/dispatcher-extractor
       tag: "0.3.0"

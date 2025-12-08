@@ -65,6 +65,8 @@ spec:
             {{- include "dispatcher.env" . | nindent 12 }}
             - name: RECRUITAIR_HTTP_TIMEOUT
               value: "{{ .Values.dispatcher.evaluator.httpTimeout }}"
+            - name: RECRUITAIR_BATCH_SIZE
+              value: "{{ .Values.dispatcher.evaluator.batchSize }}"
             - name: RECRUITAIR_EVALUATOR_API_BASE_URL
               value: "http://{{ .Release.Name }}-evaluator-api:{{ .Values.evaluator.service.port }}"
             - name: RECRUITAIR_EVALUATOR_API_BEARER_TOKEN
